@@ -15,19 +15,20 @@ var fs = require("fs");
 
 // Parsed terminal requests
 var requestRaw = process.argv.splice(3, process.argv.length - 1);
-var request = requestRaw.join('');
+var request = requestRaw.join(' ');
 var command = process.argv[2];
+var resultsRaw = [];
 
 
 function liriSearch() {
 
   var bandsQueryUrl = `https://rest.bandsintown.com/artists/${request}/events?app_id=codingbootcamp`;
-  var movieQueryUrl = `http://www.omdbapi.com/?t=${requestRaw}&y=&plot=short&apikey=trilogy`;
+  var movieQueryUrl = `http://www.omdbapi.com/?t=${request}&y=&plot=short&apikey=trilogy`;
 
 
   if (command == 'spotify-this-song') {
     spotify
-    .search({ type: 'track', query: `${requestRaw}`, limit: 1 })
+    .search({ type: 'track', query: `${request}`, limit: 1 })
     .then(function(response) {
 
       // Display multiple artists
@@ -45,6 +46,17 @@ function liriSearch() {
       var previewURL = response.tracks.items[0].preview_url;
       var albumName = response.tracks.items[0].album.name;
       
+      resultsRaw.push(`Track Name: "${trackName}"`,
+                    `Artist(s): ${artistName}`,
+                    `Album: ${albumName}`,
+                    `Preview Link: ${previewURL}`,
+                    ``,
+                    `--------------------------------- \n`);
+
+      results = `${resultsRaw.join('\n')} \n`;
+      logSearch();
+                    
+
       console.log(`Track Name: "${trackName}"`);
       console.log(`Artist(s): ${artistName}`);
       console.log(`Album: ${albumName}`);
@@ -66,6 +78,16 @@ function liriSearch() {
         console.log(`Artist: ${artistName}`);
         console.log(`Album: ${albumName}`);
         console.log(`Preview Link: ${previewURL}`);
+
+        resultsRaw.push(`Track Name: "${trackName}"`,
+                    `Artist(s): ${artistName}`,
+                    `Album: ${albumName}`,
+                    `Preview Link: ${previewURL}`,
+                    ``,
+                    `--------------------------------- \n`);
+
+          results = `${resultsRaw.join('\n')} \n`;
+          logSearch();
         
         })
         .catch(function(err) {
@@ -87,6 +109,15 @@ function liriSearch() {
           var convertedDate = moment(`${concertDateTime}`).format("MM-DD-YYYY");
           var convertedTime = moment(`${concertDateTime}`).format("hh:mm A");
           console.log(`Date & Time of Event: ${convertedDate}, ${convertedTime}`); //Time of Event
+
+          resultsRaw.push(`Venue Name: ${response.data[1].venue.name}`,
+                          `Venue Location: ${response.data[1].venue.city}, ${response.data[1].venue.country}`,
+                          `Date & Time of Event: ${convertedDate}, ${convertedTime}`,
+                          ``,
+                          `--------------------------------- \n`);
+
+          results = `${resultsRaw.join('\n')} \n`;
+          logSearch();
       })
 
       .catch(function(error) {
@@ -108,7 +139,7 @@ function liriSearch() {
     axios
       .get(movieQueryUrl)
       .then(function(response) { 
-        console.log(response);
+        // console.log(response);
         var movieTitle = response.data.Title;
         var releaseYear = response.data.Year;
         var ratingIMDB = response.data.Ratings[0].Value;
@@ -126,6 +157,20 @@ function liriSearch() {
         console.log(`Language: ${language}`);
         console.log(`Plot: ${plot}`);
         console.log(`Actors: ${actors}`);
+
+        resultsRaw.push(`Title: ${movieTitle}`,
+                        `Year: ${releaseYear}`,
+                        `IMDB Rating: ${ratingIMDB}`,
+                        `Rotten Tomatoes Rating: ${ratingRot}`,
+                        `Country of Origin: ${country}`,
+                        `Language: ${language}`,
+                        `Plot: ${plot}`,
+                        `Actors: ${actors}`,
+                        ``,
+                        `--------------------------------- \n`);
+
+          results = `${resultsRaw.join('\n')} \n`;
+          logSearch();
       })
 
       .catch(function(error) {
@@ -144,10 +189,12 @@ function liriSearch() {
 
 
   }
+  
 }
 
-liriSearch();
 
+
+function randomSearch() {
   if (command == 'do-what-it-says') {
     fs.readFile('random.txt', 'utf-8', function(error, data) { 
       
@@ -163,10 +210,29 @@ liriSearch();
       liriSearch();
 
     });
-
-
-
-
   }
+
+  
+}
+
+
+// console.log(results);
+function logSearch() {
+  // We will add the value to the random file.
+  fs.appendFile("log.txt", `${results}`, function(err) {
+
+  // fs.appendFile("log.txt", `${command} ${request} \n`, function(err) {
+    if (err) {
+      return console.log(err);
+    }
+  });
+
+  // console.log(`${command} ${request}`);
+}
+
+// RUN FEATURES
+liriSearch();
+randomSearch();
+// logSearch();
 
   
