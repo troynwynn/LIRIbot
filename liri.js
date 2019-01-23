@@ -3,57 +3,78 @@
 // - node spotify-this-song '<song name here>'
 // - node liri.js movie-this '<movie name here>'
 
-require("dotenv").config();
 
+// Required Packages
+require("dotenv").config();
 var Spotify = require('node-spotify-api');
-// console.log(Spotify);
 var keys = require("./keys.js");
 var spotify = new Spotify(keys.spotify);
-// var spotify = new Spotify({
-//   id: '193b51795e6140a58d870823049a2bc7',
-//   secret: 'eef884e0e6484bba8bfd67310e331256'
-// });
-
-
-// console.log(spotify);
-
 var axios = require("axios");
-
 var moment = require('moment');
-// moment().format();
+var fs = require("fs");
 
-
-
+// Parsed terminal requests
 var requestRaw = process.argv.splice(3, process.argv.length - 1);
 var request = requestRaw.join('');
-
 var command = process.argv[2];
-// console.log(command);
-// console.log(artist);
-
-// console.log(artist);
-var bandsQueryUrl = `https://rest.bandsintown.com/artists/${request}/events?app_id=codingbootcamp`;
-var movieQueryUrl = `http://www.omdbapi.com/?t=${request}&y=&plot=short&apikey=trilogy`;
 
 
-if (command == 'spotify-this-song') {
-  spotify
-  .search({ type: 'track', query: `${request}`, limit: '1' })
-  .then(function(response) {
-    console.log(response.tracks.items);
-  })
-  .catch(function(err) {
-    console.log(err);
-  });
-  
-  // spotify.search({ type: 'track', query: 'All the Small Things' }, function(err, data) {
-  //   if (err) {
-  //     return console.log('Error occurred: ' + err);
-  //   }
-  
-  // console.log(data); 
-  // });
-}
+function liriSearch() {
+
+  var bandsQueryUrl = `https://rest.bandsintown.com/artists/${request}/events?app_id=codingbootcamp`;
+  var movieQueryUrl = `http://www.omdbapi.com/?t=${requestRaw}&y=&plot=short&apikey=trilogy`;
+
+
+  if (command == 'spotify-this-song') {
+    spotify
+    .search({ type: 'track', query: `${requestRaw}`, limit: 1 })
+    .then(function(response) {
+
+      // Display multiple artists
+      if (response.tracks.items[0].artists.length >= 2) {
+        var artistName = [response.tracks.items[0].artists[0].name];
+        for (i=1; i<response.tracks.items[0].artists.length; i++) {
+          artistName.push(` ${response.tracks.items[0].artists[i].name}`); // Artist Name (if it's more than 1)
+      }
+    }
+
+      else {
+        var artistName = response.tracks.items[0].artists[0].name;
+      }
+      var trackName = response.tracks.items[0].name;
+      var previewURL = response.tracks.items[0].preview_url;
+      var albumName = response.tracks.items[0].album.name;
+      
+      console.log(`Track Name: "${trackName}"`);
+      console.log(`Artist(s): ${artistName}`);
+      console.log(`Album: ${albumName}`);
+      console.log(`Preview Link: ${previewURL}`);
+
+    })
+    .catch(function(err) {
+      console.error('Error occurred: ' + err); 
+
+      spotify
+      .request('https://api.spotify.com/v1/tracks/3Gxku40T2RGPqtLYpFAngP')
+        .then(function(data) {
+        var artistName = data.artists[0].name; // Artist Name
+        var trackName = data.name;
+        var previewURL = data.preview_url;
+        var albumName = data.album.name;
+        
+        console.log(`Track Name: "${trackName}"`);
+        console.log(`Artist: ${artistName}`);
+        console.log(`Album: ${albumName}`);
+        console.log(`Preview Link: ${previewURL}`);
+        
+        })
+        .catch(function(err) {
+          console.error('Error occurred: ' + err); 
+        });
+    });
+  }
+
+
   
   if (command == 'concert-this') {
     axios
@@ -87,6 +108,7 @@ if (command == 'spotify-this-song') {
     axios
       .get(movieQueryUrl)
       .then(function(response) { 
+        console.log(response);
         var movieTitle = response.data.Title;
         var releaseYear = response.data.Year;
         var ratingIMDB = response.data.Ratings[0].Value;
@@ -119,6 +141,30 @@ if (command == 'spotify-this-song') {
         console.log(error.config);
       }
     );
+
+
+  }
+}
+
+liriSearch();
+
+  if (command == 'do-what-it-says') {
+    fs.readFile('random.txt', 'utf-8', function(error, data) { 
+      
+      if (error) {
+        return console.log(error);
+      }
+
+      console.log(data);
+      var randomReq = data.split(",");
+      console.log(randomReq);
+      command = randomReq[0];
+      request = randomReq[1];
+      liriSearch();
+
+    });
+
+
 
 
   }
