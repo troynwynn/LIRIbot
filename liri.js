@@ -22,10 +22,11 @@ var resultsRaw = [];
 
 function liriSearch() {
 
+  //  QUERY URLS
   var bandsQueryUrl = `https://rest.bandsintown.com/artists/${request}/events?app_id=codingbootcamp`;
   var movieQueryUrl = `http://www.omdbapi.com/?t=${request}&y=&plot=short&apikey=trilogy`;
 
-
+  // NODE-SPOTIFY-API
   if (command == 'spotify-this-song') {
     spotify
     .search({ type: 'track', query: `${request}`, limit: 1 })
@@ -96,28 +97,28 @@ function liriSearch() {
     });
   }
 
-
-  
+  // AXIOS - BANDS IN TOWN
   if (command == 'concert-this') {
     axios
       .get(bandsQueryUrl)
       .then(function(response) {
-          console.log(`Venue Name: ${response.data[1].venue.name}`); // Name of Venue
-          console.log(`Venue Location: ${response.data[1].venue.city}, ${response.data[1].venue.country}`); // Venue location
-          
-          var concertDateTime = response.data[1].datetime;
+        // console.log(response.data);
+        for (i=0; i < 3; i++) {
+          var concertDateTime = response.data[i].datetime;
           var convertedDate = moment(`${concertDateTime}`).format("MM-DD-YYYY");
           var convertedTime = moment(`${concertDateTime}`).format("hh:mm A");
-          console.log(`Date & Time of Event: ${convertedDate}, ${convertedTime}`); //Time of Event
-
-          resultsRaw.push(`Venue Name: ${response.data[1].venue.name}`,
-                          `Venue Location: ${response.data[1].venue.city}, ${response.data[1].venue.country}`,
+          resultsRaw.push(``,
+                          `Lineup: ${response.data[i].lineup}`,
+                          `Venue Name: ${response.data[i].venue.name}`,
+                          `Venue Location: ${response.data[i].venue.city}, ${response.data[i].venue.country}`,
                           `Date & Time of Event: ${convertedDate}, ${convertedTime}`,
                           ``,
-                          `--------------------------------- \n`);
+                          `---------------------------------`);
 
-          results = `${resultsRaw.join('\n')} \n`;
+          results = `${resultsRaw.join('\n')}`;
+          console.log(results);
           logSearch();
+        }
       })
 
       .catch(function(error) {
@@ -135,6 +136,7 @@ function liriSearch() {
     );
   }
 
+  //AXIOS - OMDB
   if (command == 'movie-this') {
     axios
       .get(movieQueryUrl)
