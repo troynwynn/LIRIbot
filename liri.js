@@ -169,12 +169,60 @@ function liriSearch() {
       })
 
       .catch(function(error) {
-       console.error(`Sorry. I couldnt find any movie information for '${request}'.`);
+        console.error(`Sorry. I couldnt find any movie information for that but I have another choice you may like.`);
+        request = 'Mr. Nobody';
+        movieQueryUrl = `http://www.omdbapi.com/?t=${request}&y=&plot=short&apikey=trilogy`;
+        axios
+        .get(movieQueryUrl)
+        .then(function(response) { 
+          // console.log(response);
+          var movieTitle = response.data.Title;
+          var releaseYear = response.data.Year;
+          var ratingIMDB = response.data.Ratings[0].Value;
+          var ratingRot = response.data.Ratings[1].Value;
+          var country = response.data.Country;
+          var language = response.data.Language;
+          var plot = response.data.Plot;
+          var actors = response.data.Actors;
+
+          console.log(`Title: ${movieTitle}`);
+          console.log(`Year: ${releaseYear}`);
+          console.log(`IMDB Rating: ${ratingIMDB}`);
+          console.log(`Rotten Tomatoes Rating: ${ratingRot}`);
+          console.log(`Country of Origin: ${country}`);
+          console.log(`Language: ${language}`);
+          console.log(`Plot: ${plot}`);
+          console.log(`Actors: ${actors}`);
+
+          resultsRaw.push(`Title: ${movieTitle}`,
+                          `Year: ${releaseYear}`,
+                          `IMDB Rating: ${ratingIMDB}`,
+                          `Rotten Tomatoes Rating: ${ratingRot}`,
+                          `Country of Origin: ${country}`,
+                          `Language: ${language}`,
+                          `Plot: ${plot}`,
+                          `Actors: ${actors}`,
+                          ``,
+                          `--------------------------------- \n`);
+
+            results = `${resultsRaw.join('\n')} \n`;
+            logSearch();
+        })
+
+        .catch(function(error) {
+        console.error(`Sorry. I couldnt find any movie information for '${request}'.`);
+        }
+      );
       }
     );
 
-
   }
+
+  // if (command == 'movie-this' && request == '') {
+    
+
+
+  // }
   
 }
 
