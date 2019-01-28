@@ -113,7 +113,7 @@ function liriSearch() {
                           `Venue Location: ${response.data[i].venue.city}, ${response.data[i].venue.country}`,
                           `Date & Time of Event: ${convertedDate}, ${convertedTime}`,
                           ``,
-                          `---------------------------------`);
+                          `---------------------------------\n`);
 
           results = `${resultsRaw.join('\n')}`;
           
