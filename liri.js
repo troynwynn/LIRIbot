@@ -186,9 +186,7 @@ function randomSearch() {
         return console.log(error);
       }
 
-      console.log(data);
       var randomReq = data.split(",");
-      console.log(randomReq);
       command = randomReq[0];
       request = randomReq[1];
       liriSearch();
@@ -202,7 +200,7 @@ function randomSearch() {
 
 function logSearch() {
 
-    fs.appendFile("log.txt", `Okay, here's what I found: \n ${results}`, function(err) {
+    fs.appendFile("log.txt", `\nOkay, here's what I found, TROY: \n\n${results}`, function(err) {
       if (err) {
         return console.log(err);
       }
