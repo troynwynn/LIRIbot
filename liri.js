@@ -65,7 +65,7 @@ function liriSearch() {
 
     })
     .catch(function(err) {
-      console.error('Error occurred: ' + err); 
+      console.error(`I'm sorry. I don't know that one, I hope you enjoy this.`); 
 
       spotify
       .request('https://api.spotify.com/v1/tracks/3Gxku40T2RGPqtLYpFAngP')
@@ -102,13 +102,13 @@ function liriSearch() {
     axios
       .get(bandsQueryUrl)
       .then(function(response) {
-        // console.log(response.data);
-        for (i=0; i < 3; i++) {
+        for (i=0; i < 5; i++) {
+          var lineup = response.data[i].lineup.join(', ');
           var concertDateTime = response.data[i].datetime;
           var convertedDate = moment(`${concertDateTime}`).format("MM-DD-YYYY");
           var convertedTime = moment(`${concertDateTime}`).format("hh:mm A");
           resultsRaw.push(``,
-                          `Lineup: ${response.data[i].lineup}`,
+                          `Lineup: ${lineup}`,
                           `Venue Name: ${response.data[i].venue.name}`,
                           `Venue Location: ${response.data[i].venue.city}, ${response.data[i].venue.country}`,
                           `Date & Time of Event: ${convertedDate}, ${convertedTime}`,
@@ -116,24 +116,17 @@ function liriSearch() {
                           `---------------------------------`);
 
           results = `${resultsRaw.join('\n')}`;
-          console.log(results);
-          logSearch();
+          
         }
+
+        console.log(`
+                      ${results}`);
+          logSearch();
       })
 
       .catch(function(error) {
-        if (error.response) {
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          console.log(error.request);
-        } else { 
-          console.log("Error", error.message);
-        }
-        console.log(error.config);
-      }
-    );
+        console.error(`Sorry. I couldnt find any concert information for '${request}'.`);
+      });
   }
 
   //AXIOS - OMDB
@@ -176,16 +169,7 @@ function liriSearch() {
       })
 
       .catch(function(error) {
-        if (error.response) {
-          console.log(error.response.data);
-          console.log(error.response.status);
-          console.log(error.response.headers);
-        } else if (error.request) {
-          console.log(error.request);
-        } else {
-          console.log("Error", error.message);
-        }
-        console.log(error.config);
+       console.error(`Sorry. I couldnt find any movie information for '${request}'.`);
       }
     );
 
@@ -193,8 +177,6 @@ function liriSearch() {
   }
   
 }
-
-
 
 function randomSearch() {
   if (command == 'do-what-it-says') {
@@ -218,23 +200,17 @@ function randomSearch() {
 }
 
 
-// console.log(results);
 function logSearch() {
-  // We will add the value to the random file.
-  fs.appendFile("log.txt", `${results}`, function(err) {
 
-  // fs.appendFile("log.txt", `${command} ${request} \n`, function(err) {
-    if (err) {
-      return console.log(err);
-    }
-  });
-
-  // console.log(`${command} ${request}`);
+    fs.appendFile("log.txt", `Okay, here's what I found: \n ${results}`, function(err) {
+      if (err) {
+        return console.log(err);
+      }
+    });
 }
 
 // RUN FEATURES
 liriSearch();
 randomSearch();
-// logSearch();
 
   
