@@ -1,6 +1,6 @@
 # LIRIbot
 
-## Getting Started
+## Introduction
 LIRI is a _Language_ Interpretation and Recognition Interface. LIRI will be a command line node app that takes in parameters and gives you back data. It retrieves and returns data via various API calls.
 
 ## Required Files
